@@ -1,0 +1,40 @@
+# ==========================
+# Python
+# ==========================
+__pycache__/
+**/__pycache__/
+*.py[cod]
+
+# Jupyter
+.ipynb_checkpoints/
+
+# ==========================
+# Virtual environments
+# ==========================
+.venv/
+venv/
+firstapp/.venv/
+
+# ==========================
+# IDE settings
+# ==========================
+.vscode/
+.idea/
+
+# ==========================
+# Environment variables
+# ==========================
+.env
+
+# ==========================
+# Trained models
+# ==========================
+*.pth
+*.pt
+*.pkl
+
+# ==========================
+# Operating system files
+# ==========================
+.DS_Store
+Thumbs.db
