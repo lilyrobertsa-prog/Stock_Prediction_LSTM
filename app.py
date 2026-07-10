@@ -1,5 +1,7 @@
 from flask import Flask, request, render_template
 import os
+from main import run_experiment
+
 
 
 app = Flask(__name__, template_folder = 'templates')
@@ -9,47 +11,40 @@ print("Looking for templates in:", os.path.abspath(app.template_folder))
 print("Files there:", os.listdir(app.template_folder))
 
 
-@app.route('/')
-def index():
-    mylist = [10, 20, 30, 40, 50]
-    return render_template(template_name_or_list='index.html', mylist = mylist)
+from flask import Flask, render_template, request
+from main import run_experiment
 
+app = Flask(__name__)
 
+@app.route("/", methods=["GET", "POST"])
+def home():
+    results = None
+    #error = None
 
-@app.route('/hello')
-def hello():
-    return render_template(
-        'index.html',
-        myvalue='test value',
-        myresult='test result'
-    )
+    if request.method == "POST":
+        ticker = request.form["ticker"]
+        start_date = request.form["start_date"]
+        end_date = request.form["end_date"]
 
+        ##settings panel (javascript or CSS)
+        seq_length = int(request.form["seq_length"])
+        num_epochs = int(request.form["num_epochs"])
+        hidden_dim = int(request.form["hidden_dim"])
+        batch_size = int(request.form["batch_size"])
+        learning_rate = float(request.form["learning_rate"])
 
-@app.route('/greet/<name>')
-def greet(name):
-    return f"Hello {name}"
+        results = run_experiment(
+            ticker=ticker,
+            start_date=start_date,
+            end_date=end_date,
+            SEQ_LENGTH=seq_length,
+            NUM_EPOCHS=num_epochs,
+            HIDDEN_DIM=hidden_dim,
+            BATCH_SIZE=batch_size,
+            LEARNING_RATE=learning_rate
+        )
 
-
-@app.route('/add/<int:number1>/<int:number2>')
-def add(number1, number2):
-    return f"{number1} + {number2} = {number1 + number2}"
-
-
-
-@app.route('/handle_url_params')
-def handle_params():
-    if 'greeting' in request.args.keys() and "name" in request.args.keys():
-
-        greeting = request.args.get('greeting')
-        name = request.args['name']
-        return f"{greeting}, {name}"
-    
-    else:
-        return 'Some parameters are missing'
-
-
-
-
+    return render_template("index.html", results=results)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=555, debug=True)

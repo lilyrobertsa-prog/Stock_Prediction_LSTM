@@ -6,7 +6,7 @@
 
 
 
-This project investigates whether an LSTM neural network can predict next-day stock returns using historical market data and technical indicators.
+This project investigates whether an LSTM neural network can predict next-day stock returns using historical market data and technical indicators. It also compares the LSTM Model to a Linear Regression model.
 
 
 
@@ -18,7 +18,6 @@ This project investigates whether an LSTM neural network can predict next-day st
 
 \- Technical indicators (RSI, MACD, EMA, SMA, ATR, volatility)
 
-\- Mutual information feature selection
 
 \- LSTM implemented in PyTorch
 
