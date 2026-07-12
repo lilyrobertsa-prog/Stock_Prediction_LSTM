@@ -18,6 +18,31 @@
             transform: rotate(360deg);
         }
     }
+
+    .graphs {
+        max-width: 1100px;
+        margin: 40px auto;
+    }
+
+    .graph-card {
+        background: white;
+        padding: 24px;
+        margin-bottom: 28px;
+        border-radius: 12px;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+    }
+
+    .graph-card h3 {
+        margin-top: 0;
+    }
+
+    .graph-card img {
+        display: block;
+        width: 100%;
+        height: auto;
+        margin-top: 18px;
+        border-radius: 8px;
+    }
     </style>
 </head>
 
@@ -92,6 +117,60 @@ document.getElementById("predictionForm").addEventListener("submit", function ()
         <p>LSTM Test RMSE: {{ results.lstm_test_rmse }}</p>
         <p>LSTM Direction Accuracy: {{ results.lstm_direction_accuracy }}</p>
         <p>LSTM Average Absolute Error: {{ results.abs_error_l }}</p>
+    {% endif %}
+
+    {% if prediction_graph %}
+
+    <section class="graphs">
+
+        <h2>Model Visualisations</h2>
+
+        <div class="graph-card">
+            <h3>Actual vs Predicted Returns</h3>
+
+            <p>
+                This graph compares the actual daily returns with the returns
+                predicted by linear regression and the LSTM.
+            </p>
+
+            <img
+                src="data:image/png;base64,{{ prediction_graph }}"
+                alt="Actual returns compared with model predictions"
+            >
+        </div>
+
+
+        <div class="graph-card">
+            <h3>Absolute Prediction Error</h3>
+
+            <p>
+                Lower values indicate that the prediction was closer to the
+                actual return.
+            </p>
+
+            <img
+                src="data:image/png;base64,{{ error_graph }}"
+                alt="Absolute prediction errors over time"
+            >
+        </div>
+
+
+        <div class="graph-card">
+            <h3>Model Error Comparison</h3>
+
+            <p>
+                Lower RMSE and MAE values indicate better numerical prediction
+                accuracy.
+            </p>
+
+            <img
+                src="data:image/png;base64,{{ metric_graph }}"
+                alt="Comparison of model error metrics"
+            >
+        </div>
+
+    </section>
+
     {% endif %}
 
     <script>

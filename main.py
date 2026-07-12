@@ -39,6 +39,8 @@ from scaling_lstm import lstm_scaler
 
 from evaluate import evaluate_predictions
 
+import os
+
 
 # settings
 #TICKER = "MSFT"
@@ -54,13 +56,146 @@ LEARNING_RATE = 0.001
 NUM_EPOCHS = 100
 TOP_FEATURES = 7
 
+
+
+def load_or_update_stock_data(ticker):
+
+    """
+    Load a ticker's cached daily history and update it with any newer data.
+
+    Returns:
+        A DataFrame containing all cached available daily data.
+    """
+    ticker = ticker.upper().strip()
+
+    os.makedirs("saved_data", exist_ok=True)
+
+    data_path = os.path.join(
+        "saved_data",
+        f"{ticker}.csv"
+    )
+
+    if not os.path.exists(data_path):
+        print(f"Downloading all available data for {ticker}...")
+
+        df = yf.download(
+            ticker,
+            period="max",
+            interval="1d",
+            auto_adjust=True,
+            progress=False
+        )
+
+        if df.empty:
+            raise ValueError(
+                "No data found. Check the ticker symbol."
+            )
+
+        if isinstance(df.columns, pd.MultiIndex):
+            df.columns = df.columns.get_level_values(0)
+
+        df.index = pd.to_datetime(df.index)
+        df.index.name = "Date"
+
+        df.to_csv(data_path)
+
+        return df
+
+    print(f"Loading saved data for {ticker}...")
+
+    saved_df = pd.read_csv(
+        data_path,
+        index_col="Date",
+        parse_dates=True
+    )
+
+    saved_df.index = pd.to_datetime(saved_df.index)
+
+    last_saved_date = saved_df.index.max()
+
+    # Start from the last saved date so that the final stored row
+    # can also be refreshed if Yahoo has corrected it.
+    update_start = last_saved_date.strftime("%Y-%m-%d")
+
+    print(
+        f"Checking for updates from {update_start}..."
+    )
+
+    new_df = yf.download(
+        ticker,
+        start=update_start,
+        interval="1d",
+        auto_adjust=True,
+        progress=False
+    )
+
+    if not new_df.empty:
+        if isinstance(new_df.columns, pd.MultiIndex):
+            new_df.columns = new_df.columns.get_level_values(0)
+
+        new_df.index = pd.to_datetime(new_df.index)
+
+        combined_df = pd.concat(
+            [saved_df, new_df]
+        )
+
+        # If the same date appears twice, keep the newly downloaded row.
+        combined_df = combined_df[
+            ~combined_df.index.duplicated(keep="last")
+        ]
+
+        combined_df = combined_df.sort_index()
+        combined_df.index.name = "Date"
+
+        combined_df.to_csv(data_path)
+
+        print(
+            f"Data updated. Latest date: "
+            f"{combined_df.index.max().date()}"
+        )
+
+        return combined_df
+
+    print("Saved data is already up to date.")
+
+    return saved_df
+
+
+
+
+
+
+
+
 def run_experiment(ticker, start_date, end_date, SEQ_LENGTH=SEQ_LENGTH, NUM_EPOCHS=NUM_EPOCHS, HIDDEN_DIM=HIDDEN_DIM, NUM_LAYERS=NUM_LAYERS, DROPOUT=DROPOUT, BATCH_SIZE=BATCH_SIZE, LEARNING_RATE=LEARNING_RATE):
 
-    df = yf.download(ticker, start=start_date, end=end_date)
+    os.makedirs("saved_models", exist_ok=True)
+
+    model_path = os.path.join(
+        "saved_models",
+        f"{ticker}_"
+        f"{start_date}_"
+        f"{end_date}_"
+        f"seq{SEQ_LENGTH}_"
+        f"h{HIDDEN_DIM}_"
+        f"layers{NUM_LAYERS}.pth"
+    )
+
+    df_all = load_or_update_stock_data(ticker)
+
+    start_date = pd.to_datetime(start_date)
+    end_date = pd.to_datetime(end_date)
+
+    df = df_all.loc[
+        (df_all.index >= start_date) &
+        (df_all.index < end_date)
+    ].copy()
 
     if df.empty:
-        raise ValueError("No data found. Check ticker and date range.")
-
+        raise ValueError(
+            "No data found for the selected date range."
+        )
+    
     if isinstance(df.columns, pd.MultiIndex):
         df.columns = df.columns.get_level_values(0)
         
@@ -74,9 +209,8 @@ def run_experiment(ticker, start_date, end_date, SEQ_LENGTH=SEQ_LENGTH, NUM_EPOC
     linear.train(X_train_raw, y_train_raw)
 
     y_train_pred_lin = linear.predict(X_train_raw)
-    y_test_pred_lin = linear.predict(X_test_raw)
 
-    linear_pred = linear.predict(X_test_raw)
+    y_test_pred_lin = linear.predict(X_test_raw)
 
     train_rmse_lin, test_rmse_lin, direction_accuracy_lin, abs_error_lin = evaluate_predictions(y_train_pred_lin, y_test_pred_lin, y_train_raw, y_test_raw)
     
@@ -86,6 +220,8 @@ def run_experiment(ticker, start_date, end_date, SEQ_LENGTH=SEQ_LENGTH, NUM_EPOC
 
 
     ##LSTM
+
+
 
     X_train_scaled, X_test_scaled, y_test_scaled, y_train_scaled, target_scaler = lstm_scaler(X_train_raw, X_test_raw, y_train_raw, y_test_raw)
 
@@ -107,14 +243,36 @@ def run_experiment(ticker, start_date, end_date, SEQ_LENGTH=SEQ_LENGTH, NUM_EPOC
     criterion = nn.MSELoss()
     optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
-    model = train_model(
-        model=model,
-        train_loader=train_loader,
-        criterion=criterion,
-        optimizer=optimizer,
-        device=device,
-        num_epochs=NUM_EPOCHS
+    print("Model path:", os.path.abspath(model_path))
+    print("Model exists:", os.path.exists(model_path))
+
+    if os.path.exists(model_path):
+
+        print("Loading saved model...")
+
+        model.load_state_dict(
+            torch.load(model_path, map_location=device)
         )
+
+    else:
+
+        print("Training model...")
+
+        model = train_model(
+            model=model,
+            train_loader=train_loader,
+            criterion=criterion,
+            optimizer=optimizer,
+            device=device,
+            num_epochs=NUM_EPOCHS
+        )
+
+        torch.save(
+            model.state_dict(),
+            model_path
+        )
+
+        #saves the models parameters, not the model itself
 
     y_train_pred, y_test_pred, y_train_actual, y_test_actual = make_predictions(
             model=model,
@@ -125,24 +283,36 @@ def run_experiment(ticker, start_date, end_date, SEQ_LENGTH=SEQ_LENGTH, NUM_EPOC
             target_scaler=target_scaler,
             device=device
         )
+    
+    print(y_test_pred[:10])
+    print(y_test_actual[:10])
 
 
     train_rmse_l, test_rmse_l, direction_accuracy_l, abs_error_l = evaluate_predictions(y_train_pred, y_test_pred, y_train_actual, y_test_actual)
 
     ##
+    #y_test_actual == y_test_raw
 
     return {
+        "y_test_pred_lin": y_test_pred_lin,
+        "y_test_raw": np.asarray(y_test_raw).reshape(-1),
+
+        "y_test_pred_lstm": np.asarray(y_test_pred).reshape(-1),
+
         "ticker": ticker,
         "start_date": start_date,
         "end_date": end_date,
+
         "linear_train_rmse": round(train_rmse_lin, 6),
         "linear_test_rmse": round(test_rmse_lin, 6),
         "linear_direction_accuracy": round(direction_accuracy_lin, 4),
         "abs_error_lin": round(abs_error_lin, 6),
+
         "lstm_train_rmse": round(train_rmse_l, 6),
         "lstm_test_rmse": round(test_rmse_l, 6),
         "lstm_direction_accuracy": round(direction_accuracy_l, 4),
         "abs_error_l": round(abs_error_l, 6),
+
         "seq_length": SEQ_LENGTH,
         "num_epochs": NUM_EPOCHS,
         "features_used": list(X_train_raw.columns)
