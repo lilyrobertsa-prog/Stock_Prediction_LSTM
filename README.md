@@ -83,5 +83,4 @@ project/
 - Model checkpoint saving
 - Docker deployment
 - Live predictions
-- Feature selection using mutual information
 - Deploy on Render
