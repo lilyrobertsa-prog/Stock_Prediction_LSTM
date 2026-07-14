@@ -191,10 +191,20 @@ def run_experiment(ticker, start_date, end_date, SEQ_LENGTH=SEQ_LENGTH, NUM_EPOC
         (df_all.index < end_date)
     ].copy()
 
+    if start_date >= end_date:
+        raise ValueError("The start date must be before the end date.")
+
     if df.empty:
         raise ValueError(
             "No data found for the selected date range."
         )
+    
+    
+    if len(df) < 100:
+        raise ValueError("Not enough historical data for this model.")
+    
+    if len(df) <= SEQ_LENGTH:
+        raise ValueError("The selected date range is too short")
     
     if isinstance(df.columns, pd.MultiIndex):
         df.columns = df.columns.get_level_values(0)

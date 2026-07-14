@@ -16,6 +16,7 @@ The application is built with Python, PyTorch and Flask, allowing users to enter
 - Compare multiple evaluation metrics
 - Flask web interface
 - Plots of predictions
+- Error handling
 
 
 ## Models
@@ -83,3 +84,4 @@ project/
 - Docker deployment
 - Live predictions
 - Feature selection using mutual information
+- Deploy on Render
