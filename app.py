@@ -91,14 +91,6 @@ def home():
             y_test_pred_lin,
             y_test_pred_lstm
         )
-        
-
-
-        prediction_graph = prediction_plot(
-            y_test_raw,
-            y_test_pred_lin,
-            y_test_pred_lstm
-        )
 
         error_graph = error_plot(
             y_test_raw,
@@ -120,5 +112,5 @@ def home():
     return render_template("index.html", results=results, prediction_graph=prediction_graph, error_graph = error_graph, metric_graph = metric_graph)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=555, debug=True)
+    app.run(debug = False)
 
