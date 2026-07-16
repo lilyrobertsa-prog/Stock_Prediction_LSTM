@@ -1,0 +1,14 @@
+{
+    "ticker": "TSLA",
+    "linear_test_rmse": 0.03449,
+    "lstm_test_rmse": 0.035216,
+    "linear_train_rmse": 0.031283,
+    "lstm_train_rmse": 0.031065,
+    "linear_test_mae": 0.023925,
+    "lstm_test_mae": 0.024445,
+    "linear_direction": 0.488421,
+    "lstm_direction": 0.492135,
+    "sequence_length": 30,
+    "hidden_dim": 64,
+    "epochs": 100
+}

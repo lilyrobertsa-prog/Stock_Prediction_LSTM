@@ -1,0 +1,14 @@
+{
+    "ticker": "MSFT",
+    "linear_test_rmse": 0.015301,
+    "lstm_test_rmse": 0.015511,
+    "linear_train_rmse": 0.01394,
+    "lstm_train_rmse": 0.014545,
+    "linear_test_mae": 0.011074,
+    "lstm_test_mae": 0.01119,
+    "linear_direction": 0.523046,
+    "lstm_direction": 0.565032,
+    "sequence_length": 30,
+    "hidden_dim": 64,
+    "epochs": 100
+}

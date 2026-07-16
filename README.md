@@ -86,3 +86,28 @@ project/
 - Deploy on Render
 - Add SQL database
 - Make option to retrain model over same data
+
+
+
+Let the user choose a supported ticker, such as AAPL or MSFT.
+Find the saved model or saved results for that ticker.
+Load them from disk.
+Display the model’s metrics, selected features and graphs.
+Optionally use the saved model to make predictions on newly downloaded data.
+Return the page quickly without using large amounts of memory.
+
+
+add saved_results to save the metrics in results:     results = {
+        "ticker": ticker,
+        "linear_test_rmse": float(test_rmse_lin),
+        "lstm_test_rmse": float(test_rmse_l),
+        "linear_test_mae": float(abs_error_lin),
+        "lstm_test_mae": float(abs_error_l),
+        "linear_direction": float(direction_accuracy_lin),
+        "lstm_direction": float(direction_accuracy_l),
+        "sequence_length": int(SEQ_LENGTH),
+        "hidden_dim": int(HIDDEN_DIM),
+        "epochs": int(NUM_EPOCHS)
+    }
+
+    

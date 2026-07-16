@@ -43,9 +43,12 @@ import os
 
 from database import save_experiment
 
+from save_results import save_results
+
 # settings
 #TICKER = "MSFT"
-#START_DATE = "2020-01-01"
+START_DATE = "2010-01-01"
+END_DATE = "2020-01-01"
 
 SEQ_LENGTH = 30
 TRAIN_SPLIT = 0.8
@@ -168,7 +171,7 @@ def load_or_update_stock_data(ticker):
 
 
 
-def run_experiment(ticker, start_date, end_date, SEQ_LENGTH=SEQ_LENGTH, NUM_EPOCHS=NUM_EPOCHS, HIDDEN_DIM=HIDDEN_DIM, NUM_LAYERS=NUM_LAYERS, DROPOUT=DROPOUT, BATCH_SIZE=BATCH_SIZE, LEARNING_RATE=LEARNING_RATE):
+def run_experiment(ticker, start_date=START_DATE, end_date=END_DATE, SEQ_LENGTH=SEQ_LENGTH, NUM_EPOCHS=NUM_EPOCHS, HIDDEN_DIM=HIDDEN_DIM, NUM_LAYERS=NUM_LAYERS, DROPOUT=DROPOUT, BATCH_SIZE=BATCH_SIZE, LEARNING_RATE=LEARNING_RATE):
 
     os.makedirs("saved_models", exist_ok=True)
 
@@ -359,29 +362,44 @@ def run_experiment(ticker, start_date, end_date, SEQ_LENGTH=SEQ_LENGTH, NUM_EPOC
         prediction_std=np.std(y_test_pred),
         actual_std=np.std(y_test_raw),
     )
-
-    return {
-        "y_test_pred_lin": y_test_pred_lin,
-        "y_test_raw": np.asarray(y_test_raw).reshape(-1),
-
-        "y_test_pred_lstm": np.asarray(y_test_pred).reshape(-1),
-
+    results = {
         "ticker": ticker,
-        "start_date": start_date,
-        "end_date": end_date,
-
-        "linear_train_rmse": round(train_rmse_lin, 6),
-        "linear_test_rmse": round(test_rmse_lin, 6),
-        "linear_direction_accuracy": round(direction_accuracy_lin, 4),
-        "abs_error_lin": round(abs_error_lin, 6),
-
-        "lstm_train_rmse": round(train_rmse_l, 6),
-        "lstm_test_rmse": round(test_rmse_l, 6),
-        "lstm_direction_accuracy": round(direction_accuracy_l, 4),
-        "abs_error_l": round(abs_error_l, 6),
-
-        "seq_length": SEQ_LENGTH,
-        "num_epochs": NUM_EPOCHS,
-        "features_used": list(X_train_raw.columns)
+        "linear_test_rmse": round(float(test_rmse_lin), 6),
+        "lstm_test_rmse": round(float(test_rmse_l), 6),
+        "linear_train_rmse": round(float(train_rmse_lin), 6),
+        "lstm_train_rmse": round(float(train_rmse_l), 6),
+        "linear_test_mae": round(float(abs_error_lin), 6),
+        "lstm_test_mae": round(float(abs_error_l), 6),
+        "linear_direction": round(float(direction_accuracy_lin), 6),
+        "lstm_direction": round(float(direction_accuracy_l), 6),
+        "sequence_length": int(SEQ_LENGTH),
+        "hidden_dim": int(HIDDEN_DIM),
+        "epochs": int(NUM_EPOCHS)
     }
+    save_results(results, ticker) 
+
+    y_test_raw = np.asarray(y_test_raw).reshape(-1)
+    y_test_pred_lin = np.asarray(y_test_pred_lin).reshape(-1)
+    y_test_pred = np.asarray(y_test_pred).reshape(-1)
+
+    minimum_length = min(
+        len(y_test_raw),
+        len(y_test_pred_lin),
+        len(y_test_pred)
+    )
+
+    prediction_df = pd.DataFrame({
+        "Actual": y_test_raw[-minimum_length:],
+        "Linear": y_test_pred_lin[-minimum_length:],
+        "LSTM": y_test_pred[-minimum_length:]
+    })
+
+    os.makedirs("saved_predictions", exist_ok=True)
+    prediction_df.to_csv(
+        f"saved_predictions/{ticker}_predictions.csv", index=False
+    )
+
+    print(f"Predictions saved to: saved_predictions/{ticker}_predictions.csv")
+    
+    return results
 

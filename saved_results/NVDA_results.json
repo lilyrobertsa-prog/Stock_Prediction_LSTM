@@ -1,0 +1,14 @@
+{
+    "ticker": "NVDA",
+    "linear_test_rmse": 0.028553,
+    "lstm_test_rmse": 0.029188,
+    "linear_train_rmse": 0.024668,
+    "lstm_train_rmse": 0.024458,
+    "linear_test_mae": 0.020062,
+    "lstm_test_mae": 0.020684,
+    "linear_direction": 0.503006,
+    "lstm_direction": 0.522388,
+    "sequence_length": 30,
+    "hidden_dim": 64,
+    "epochs": 100
+}

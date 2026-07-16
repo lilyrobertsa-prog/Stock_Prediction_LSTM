@@ -1,0 +1,14 @@
+{
+    "ticker": "GOOGL",
+    "linear_test_rmse": 0.016436,
+    "lstm_test_rmse": 0.016473,
+    "linear_train_rmse": 0.014969,
+    "lstm_train_rmse": 0.014936,
+    "linear_test_mae": 0.011491,
+    "lstm_test_mae": 0.01162,
+    "linear_direction": 0.561122,
+    "lstm_direction": 0.515991,
+    "sequence_length": 30,
+    "hidden_dim": 64,
+    "epochs": 100
+}
