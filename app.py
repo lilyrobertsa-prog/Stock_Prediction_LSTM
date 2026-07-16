@@ -5,7 +5,7 @@ from main import run_experiment
 
 from plots import prediction_plot, error_plot, metric_plot
 
-
+from database import get_experiments, initialise_database
 
 app = Flask(__name__, template_folder = 'templates')
 
@@ -18,6 +18,24 @@ from flask import Flask, render_template, request
 from main import run_experiment
 
 app = Flask(__name__)
+initialise_database()
+
+@app.route("/history")
+def history():
+    ticker = request.args.get("ticker", "").strip()
+    model_type = request.args.get("model_type", "").strip()
+
+    experiments = get_experiments(
+        ticker=ticker or None,
+        model_type=model_type or None,
+    )
+
+    return render_template(
+        "history.html",
+        experiments=experiments,
+        selected_ticker=ticker,
+        selected_model=model_type,
+    )
 
 @app.route("/", methods=["GET", "POST"])
 def home():

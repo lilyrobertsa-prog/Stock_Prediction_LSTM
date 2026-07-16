@@ -41,6 +41,7 @@ from evaluate import evaluate_predictions
 
 import os
 
+from database import save_experiment
 
 # settings
 #TICKER = "MSFT"
@@ -303,6 +304,62 @@ def run_experiment(ticker, start_date, end_date, SEQ_LENGTH=SEQ_LENGTH, NUM_EPOC
     ##
     #y_test_actual == y_test_raw
 
+    save_experiment(
+        ticker=ticker,
+        model_type="Linear Regression",
+        start_date=start_date,
+        end_date=end_date,
+
+        sequence_length=None,
+        hidden_dimension=None,
+        number_of_layers=None,
+        dropout=None,
+        epochs=None,
+        batch_size=None,
+        learning_rate=None,
+
+        top_features=TOP_FEATURES,
+        selected_features=list(X_train_raw.columns),
+
+        train_rmse=train_rmse_lin,
+        test_rmse=test_rmse_lin,
+        test_mae=abs_error_lin,
+        directional_accuracy=direction_accuracy_lin,
+
+        mean_prediction=np.mean(y_test_pred_lin),
+        mean_actual=np.mean(y_test_raw),
+        prediction_std=np.std(y_test_pred_lin),
+        actual_std=np.std(y_test_raw),
+    )
+
+    save_experiment(
+        ticker=ticker,
+        model_type="LSTM",
+        start_date=start_date,
+        end_date=end_date,
+
+        sequence_length=SEQ_LENGTH,
+        hidden_dimension=HIDDEN_DIM,
+        number_of_layers=NUM_LAYERS,
+        dropout=DROPOUT,
+        epochs=NUM_EPOCHS,
+        batch_size=BATCH_SIZE,
+        learning_rate=LEARNING_RATE,
+
+        top_features=TOP_FEATURES,
+        selected_features=list(X_train_raw.columns),
+
+        train_rmse=train_rmse_l,
+        test_rmse=test_rmse_l,
+        test_mae=abs_error_l,
+        directional_accuracy=direction_accuracy_l,
+
+        mean_prediction=np.mean(y_test_pred),
+        mean_actual=np.mean(y_test_raw),
+        prediction_std=np.std(y_test_pred),
+        actual_std=np.std(y_test_raw),
+    )
+
     return {
         "y_test_pred_lin": y_test_pred_lin,
         "y_test_raw": np.asarray(y_test_raw).reshape(-1),
@@ -327,3 +384,4 @@ def run_experiment(ticker, start_date, end_date, SEQ_LENGTH=SEQ_LENGTH, NUM_EPOC
         "num_epochs": NUM_EPOCHS,
         "features_used": list(X_train_raw.columns)
     }
+

@@ -1,0 +1,103 @@
+</head>
+
+<body>
+    <h1>Experiment History</h1>
+
+    <form method="GET" action="{{ url_for('history') }}">
+        <label for="ticker">Ticker:</label>
+        <input
+            id="ticker"
+            name="ticker"
+            type="text"
+            value="{{ selected_ticker }}"
+            placeholder="MSFT"
+        >
+
+        <label for="model_type">Model:</label>
+        <select id="model_type" name="model_type">
+            <option value="">All models</option>
+
+            <option
+                value="LSTM"
+                {% if selected_model == "LSTM" %}selected{% endif %}
+            >
+                LSTM
+            </option>
+
+            <option
+                value="Linear Regression"
+                {% if selected_model == "Linear Regression" %}selected{% endif %}
+            >
+                Linear Regression
+            </option>
+        </select>
+
+        <button type="submit">Filter</button>
+    </form>
+
+    {% if experiments %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Run Date</th>
+                    <th>Ticker</th>
+
+                    <th>Model</th>
+
+                    <th>Start Date</th>
+                    <th>End Date</th>
+
+                    <th>Sequence length</th>
+                    <th>Epochs</th>
+                    <th>Train RMSE</th>
+                    <th>Test RMSE</th>
+                    <th>Test MAE</th>
+                    <th>Direction accuracy</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for experiment in experiments %}
+                    <tr>
+                        <td>{{ experiment.experiment_id }}</td>
+                        <td>{{ experiment.created_at }}</td>
+                        <td>{{ experiment.ticker }}</td>
+                        <td>{{ experiment.model_type }}</td>
+                        <td>{{experiment.start_date}}</td>
+                        <td>{{experiment.end_date}}</td>
+
+                        <td>
+                            {{ experiment.sequence_length or "—" }}
+                        </td>
+
+                        <td>
+                            {{ experiment.epochs or "—" }}
+                        </td>
+
+                        <td>
+                            {{ "%.6f"|format(experiment.train_rmse) }}
+                        </td>
+
+                        <td>
+                            {{ "%.6f"|format(experiment.test_rmse) }}
+                        </td>
+
+                        <td>
+                            {{ "%.6f"|format(experiment.test_mae) }}
+                        </td>
+
+                        <td>
+                            {{ "%.2f"|format(
+                                experiment.directional_accuracy * 100
+                            ) }}%
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No experiments matched those filters.</p>
+    {% endif %}
+</body>
+</html>

@@ -84,3 +84,5 @@ project/
 - Docker deployment
 - Live predictions
 - Deploy on Render
+- Add SQL database
+- Make option to retrain model over same data
