@@ -50,6 +50,9 @@
 
                     <th>Sequence length</th>
                     <th>Epochs</th>
+                    <th>Hidden dimension</th>
+                    <th>Batch size</th>
+                    <th>Learning rate</th>
                     <th>Train RMSE</th>
                     <th>Test RMSE</th>
                     <th>Test MAE</th>
@@ -66,8 +69,8 @@
                         <td>{{ experiment.created_at }}</td>
                         <td>{{ experiment.ticker }}</td>
                         <td>{{ experiment.model_type }}</td>
-                        <td>{{experiment.start_date}}</td>
-                        <td>{{experiment.end_date}}</td>
+                        <td>{{ experiment.start_date }}</td>
+                        <td>{{ experiment.end_date }}</td>
 
                         <td>
                             {{ experiment.sequence_length or "—" }}
@@ -75,6 +78,18 @@
 
                         <td>
                             {{ experiment.epochs or "—" }}
+                        </td>
+
+                        <td>
+                            {{ experiment.hidden_dimension }}
+                        </td>
+
+                        <td>
+                            {{ experiment.batch_size }}
+                        </td>
+
+                        <td>
+                            {{ experiment.learning_rate }}
                         </td>
 
                         <td>

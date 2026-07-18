@@ -215,7 +215,6 @@ Stock_Prediction_LSTM/
 ├── templates/
 ├── saved_models/
 ├── saved_data/
-├── images/
 └── stock_models.db
 
 
@@ -225,4 +224,3 @@ Stock_Prediction_LSTM/
 - Docker deployment
 - Add Transformer model
 - Add previous return baseline (eg. tomorrow's return = todays return)
-

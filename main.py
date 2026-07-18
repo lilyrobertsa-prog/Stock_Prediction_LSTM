@@ -178,8 +178,10 @@ def run_experiment(ticker, start_date, end_date, SEQ_LENGTH=SEQ_LENGTH, NUM_EPOC
         f"{start_date}_"
         f"{end_date}_"
         f"seq{SEQ_LENGTH}_"
+        f"epoch{NUM_EPOCHS}_"
         f"h{HIDDEN_DIM}_"
-        f"layers{NUM_LAYERS}.pth"
+        f"batch{BATCH_SIZE}"
+        f"lr{LEARNING_RATE}.pth"
     )
 
     df_all = load_or_update_stock_data(ticker)
@@ -383,7 +385,10 @@ def run_experiment(ticker, start_date, end_date, SEQ_LENGTH=SEQ_LENGTH, NUM_EPOC
 
         "seq_length": SEQ_LENGTH,
         "num_epochs": NUM_EPOCHS,
-        "selected_features": list(X_train_raw.columns)
+        "selected_features": list(X_train_raw.columns),
+        "hidden_dim": HIDDEN_DIM,
+        "batch_size": BATCH_SIZE,
+        "learning_rate": LEARNING_RATE
     }
 
 
