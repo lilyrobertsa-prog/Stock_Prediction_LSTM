@@ -166,7 +166,7 @@ python main.py
 
 Ticker: AAPL
 
-Training Period: 2015-01-01 → 2025-01-01
+Training Period: 2010-01-01 → 2020-01-01
 
 Sequence Length: 30
 
