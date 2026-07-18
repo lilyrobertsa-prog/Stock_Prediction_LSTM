@@ -8,17 +8,13 @@ from plots import prediction_plot, error_plot, metric_plot
 from database import get_experiments, initialise_database
 
 app = Flask(__name__, template_folder = 'templates')
-
+initialise_database()
 
 print("Looking for templates in:", os.path.abspath(app.template_folder))
 print("Files there:", os.listdir(app.template_folder))
 
-
-from flask import Flask, render_template, request
-from main import run_experiment
-
-app = Flask(__name__)
-initialise_database()
+print("Running app from:", os.path.abspath(__file__))
+print("Template folder:", os.path.abspath("templates"))
 
 @app.route("/history")
 def history():

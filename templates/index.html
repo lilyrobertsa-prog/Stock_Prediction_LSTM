@@ -4,6 +4,13 @@
     <title>Evaluation of Stock Returns Prediction Models</title>
     <style>
 
+    .website-description {
+        max-width: 750px;
+        margin-bottom: 30px;
+        line-height: 1.6;
+        color: #444;
+    }
+
     .error-message {
         background-color: #f8d7da;
         color: #842029;
@@ -55,13 +62,22 @@
     </style>
 </head>
 
-<script>
-document.getElementById("predictionForm").addEventListener("submit", function () {
-    document.getElementById("loading").style.display = "block";
-});
-</script>
+
 <body>
     <h1>Evaluation of Stock Returns Prediction Models</h1>
+
+    <section class="website-description">
+        <p>
+            This application compares Linear Regression and Long Short-Term Memory 
+            (LSTM) models for predicting next-day stock returns.
+
+        </p>
+
+        <p>
+            Select a company and change the settings to view metrics for each model.
+        </p>
+
+    </section>
 
     <form id = "predictionForm" method="POST">
         <label>Enter ticker:</label>
@@ -132,6 +148,7 @@ document.getElementById("predictionForm").addEventListener("submit", function ()
         <p>LSTM Test RMSE: {{ results.lstm_test_rmse }}</p>
         <p>LSTM Direction Accuracy: {{ results.lstm_direction_accuracy }}</p>
         <p>LSTM Average Absolute Error: {{ results.abs_error_l }}</p>
+        <p>Selected features: {{ results.selected_features }}</p>
     {% endif %}
 
     {% if prediction_graph %}

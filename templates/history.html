@@ -54,6 +54,8 @@
                     <th>Test RMSE</th>
                     <th>Test MAE</th>
                     <th>Direction accuracy</th>
+
+                    <th>Selected features</th>
                 </tr>
             </thead>
 
@@ -91,6 +93,10 @@
                             {{ "%.2f"|format(
                                 experiment.directional_accuracy * 100
                             ) }}%
+                        </td>
+
+                        <td>
+                            {{ experiment.selected_features }}
                         </td>
                     </tr>
                 {% endfor %}

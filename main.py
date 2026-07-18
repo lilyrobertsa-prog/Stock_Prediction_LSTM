@@ -360,7 +360,8 @@ def run_experiment(ticker, start_date, end_date, SEQ_LENGTH=SEQ_LENGTH, NUM_EPOC
         actual_std=np.std(y_test_raw),
     )
 
-    return {
+
+    results = {
         "y_test_pred_lin": y_test_pred_lin,
         "y_test_raw": np.asarray(y_test_raw).reshape(-1),
 
@@ -382,6 +383,9 @@ def run_experiment(ticker, start_date, end_date, SEQ_LENGTH=SEQ_LENGTH, NUM_EPOC
 
         "seq_length": SEQ_LENGTH,
         "num_epochs": NUM_EPOCHS,
-        "features_used": list(X_train_raw.columns)
+        "selected_features": list(X_train_raw.columns)
     }
+
+
+    return results
 
